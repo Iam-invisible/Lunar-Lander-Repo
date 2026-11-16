@@ -1,0 +1,39 @@
+name: Verify Vercel build
+on:
+  push:
+    branches: [codex/verify-vercel-build]
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Run Vercel install and build commands
+        run: |
+          npm ci && npm --prefix web ci --include=dev
+          npm run build
+      - name: Verify restored data
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('web/dist/tiles')
+          files=list((root/'c').rglob('*.ktx2'))+list((root/'h').rglob('*.bin'))
+          assert len(files)==73260 and sum(p.stat().st_size for p in files)==2576152160
+          assert len(list((root/'f').rglob('*.bin')))==126
+          m=json.loads((root/'meta.json').read_text())
+          assert (m['maxLevel'],m['colourMaxLevel'],m['feasibility']['maxLevel'])==(11,5,2)
+          print('Verified all 73,260 original terrain tiles and 126 feasibility grids.')
+          PY
+      - name: Render the globe and inspect a landing site
+        run: |
+          npm install --prefix "$RUNNER_TEMP/craterview-qa" playwright-core
+          python3 -m http.server 5398 --directory web/dist > "$RUNNER_TEMP/craterview-http.log" 2>&1 &
+          node .github/viewer-qa.cjs
