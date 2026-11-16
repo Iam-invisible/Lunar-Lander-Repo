@@ -1,0 +1,11 @@
+{
+  "name": "craterview-deployment",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "npm --prefix web run build && node web/scripts/restore-terrain.mjs && node web/scripts/init-quest-db.mjs"
+  },
+  "dependencies": {
+    "pg": "^8.23.1"
+  }
+}

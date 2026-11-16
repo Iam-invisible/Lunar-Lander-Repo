@@ -6,6 +6,12 @@ Pick a point on the Moon and a time in UTC to see how much sunlight reaches the 
 
 [Run locally](#run-locally) · [Explore the Moon](#explore-the-moon) · [Walk in VR](#walk-on-the-surface) · [Feasibility score](#feasibility-score) · [Site API](#site-api) · [Build the data](#build-the-data) · [Rendering and benchmarks](#terrain-and-rendering) · [Data credits](#data-credits)
 
+## Deploy to Vercel
+
+[Import this fork on Vercel](https://vercel.com/new/import?s=https%3A%2F%2Fgithub.com%2FIam-invisible%2FLunar-Lander-Repo) using the repository root (`.`) and the default settings from `vercel.json`. Each build downloads the [versioned lunar terrain](https://github.com/Iam-invisible/Lunar-Lander-Repo/releases/tag/terrain-v1), verifies its SHA-256 checksums and restores the original tiles, star maps, and landing-feasibility overlay. The Vercel CDN serves the viewer and its full-resolution terrain. Build time includes downloading and publishing roughly 73,000 files.
+
+Desktop-to-Quest pairing and casting use the original public site's room service by default. To keep rooms entirely within your own deployment, connect a PostgreSQL database, set the server-only `DATABASE_URL` to its pooled connection string and redeploy. The build creates one table named `craterview_sessions`. Both devices should open the same deployment URL.
+
 ## Run locally
 
 The orbital viewer needs the generated terrain in `web/public/tiles/`. Check for `web/public/tiles/meta.json` before starting. A fresh clone includes the walking grids, Earth texture and ephemeris. The orbital tiles and star cubemaps come from the data build. Copy the tile directory from a completed build or [generate it from the NASA data](#build-the-data).
